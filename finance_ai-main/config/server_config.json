@@ -1,0 +1,34 @@
+{
+  "server_name": "financial-assistant",
+  "server_version": "1.0.0",
+  "description": "MCP-compliant server for analyzing financial statement data of Indian companies.",
+  "tools": [
+    {
+      "name": "compare_net_income",
+      "description": "Compare net income between companies over time",
+      "input": {
+        "company_names": ["HDFC", "ICICI"]
+      }
+    },
+    {
+      "name": "summarize_balance_sheet",
+      "description": "Summarize balance sheet for a specific company and year",
+      "input": {
+        "company_name": "HDFC",
+        "year": "2023"
+      }
+    }
+  ],
+  "resources": [
+    {
+      "name": "hdfc_income.csv",
+      "type": "csv",
+      "description": "Income statement for HDFC"
+    },
+    {
+      "name": "icici_income.csv",
+      "type": "csv",
+      "description": "Income statement for ICICI"
+    }
+  ]
+}

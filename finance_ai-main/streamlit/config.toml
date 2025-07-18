@@ -1,0 +1,11 @@
+[server]
+headless = true
+enableCORS = false
+port = 8501
+
+[theme]
+base="light"
+
+[general]
+# 👇 set working directory to finance_ai-main
+root = "finance_ai-main"

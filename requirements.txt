@@ -45,4 +45,8 @@ urllib3==1.26.16
 uvicorn==0.23.2
 watchdog==3.0.0
 PyMySQL==1.1.1
+<<<<<<< HEAD
 python-Levenshtein==0.27.1
+=======
+python-Levenshtein==0.27.1
+>>>>>>> 1344f72 (requirements.txt)

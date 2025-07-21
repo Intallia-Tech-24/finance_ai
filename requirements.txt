@@ -47,7 +47,7 @@ watchdog==3.0.0
 PyMySQL==1.1.1
 python-Levenshtein==0.27.1
 
-# 🛠️ Pinned for streamlit stability
+# ⛑️ Explicit versions to prevent uninstall loops
 pygments==2.15.1
 mdurl==0.1.0
 markdown-it-py==2.2.0

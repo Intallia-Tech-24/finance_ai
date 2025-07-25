@@ -10,7 +10,19 @@ def format_tool_result(tool_name: str, result: dict) -> str:
     Returns:
         str: Formatted summary to re-inject into the LLM.
     """
-    if tool_name == "compare_net_income":
+    if tool_name == "company_info_":
+        lines = ["Comparison of company info:"]
+        comparison = result.get("comparison", {})
+        for company, yearly_data in comparison.items():
+            lines.append(f"\n{company}:")
+            if isinstance(yearly_data, dict):
+                for year, value in yearly_data.items():
+                    lines.append(f"  {year}: {value}")
+            else:
+                lines.append(f"  {yearly_data}")
+        return "\n".join(lines)
+
+    elif tool_name == "compare_net_income":
         lines = ["Comparison of Net Income:"]
         comparison = result.get("comparison", {})
         for company, yearly_data in comparison.items():
@@ -69,7 +81,31 @@ def format_tool_result(tool_name: str, result: dict) -> str:
                     lines.append("    No data available.")
 
         return "\n".join(lines)
+
+    elif tool_name == "yearly_shareholding":
+        lines = ["Comparison of Net Income:"]
+        comparison = result.get("comparison", {})
+        for company, yearly_data in comparison.items():
+            lines.append(f"\n{company}:")
+            if isinstance(yearly_data, dict):
+                for year, value in yearly_data.items():
+                    lines.append(f"  {year}: {value}")
+            else:
+                lines.append(f"  {yearly_data}")
+        return "\n".join(lines)
     
+
+    elif tool_name == "financial_ratio":
+        lines = ["Comparison of financial ratio:"]
+        comparison = result.get("comparison", {})
+        for company, yearly_data in comparison.items():
+            lines.append(f"\n{company}:")
+            if isinstance(yearly_data, dict):
+                for year, value in yearly_data.items():
+                    lines.append(f"  {year}: {value}")
+            else:
+                lines.append(f"  {yearly_data}")
+        return "\n".join(lines)
 
     elif tool_name == "compare_quarterly_income":
         lines = ["Comparison of Quarterly Income:"]
@@ -82,6 +118,41 @@ def format_tool_result(tool_name: str, result: dict) -> str:
                     lines.append(f"  {year}: {value}")
             else:
                 lines.append(f"  {yearly_data}")
+        return "\n".join(lines)
+
+    elif tool_name == "quarterly_shareholding":
+        lines = ["Comparison of Quarterly Shareholding:"]
+        comparison = result.get("comparison", {})
+        
+        for company, yearly_data in comparison.items():
+            lines.append(f"\n{company}:")
+            if isinstance(yearly_data, dict):
+                for year, value in yearly_data.items():
+                    lines.append(f"  {year}: {value}")
+            else:
+                lines.append(f"  {yearly_data}")
+        return "\n".join(lines)
+
+    elif tool_name == "three_statements_":
+        
+        lines = ["📊 Comparison of Company Info:\n"]
+        for result in result:
+                comparison = result.get("comparison", {})
+                for company, year_data in comparison.items():
+                    lines.append(f"🏢 {company}:")
+                    for year, content in year_data.items():
+                        lines.append(f"  📅 Year: {year}")
+                        if isinstance(content, dict):
+                            for section, values in content.items():
+                                lines.append(f"    📂 {section.capitalize()}:")
+                                if isinstance(values, dict):
+                                    for key, val in values.items():
+                                        lines.append(f"      • {key.capitalize()}: {val}")
+                                else:
+                                    lines.append(f"      • {section}: {values}")
+                        else:
+                            lines.append(f"    • Data: {content}")
+                    lines.append("")  # Blank line between companies
         return "\n".join(lines)
 
     else:

@@ -1,20 +1,8 @@
-import os
-import subprocess
-
-# Print list of installed packages (for debugging)
-import subprocess
-installed = subprocess.run(["pip", "freeze"], capture_output=True, text=True)
-print("🔍 Installed packages:\n", installed.stdout)
-
-
-
-
-
-
 import streamlit as st
 import sys
 import os
 from datetime import datetime
+import pandas as pd
 
 # Add root directory to path for local imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -23,7 +11,8 @@ from llm.prompt_builder import build_prompt
 from llm.gemini_client import run_gemini_prompt
 from llm.tool_router import extract_tool_call
 from llm.context_manager import build_context
-from mcp_server.tools import call_tool
+from mcp_server.tools import call_tool,three_statements_tool
+from frontend.table_create import three_statements_df , flatten_all_financials
 
 st.set_page_config(page_title="💹 Finance AI Assistant", layout="centered")
 
@@ -149,7 +138,10 @@ def finance_assistant():
                 st.json(parameters)
 
                 st.markdown("#### 🛠 Step 3: Calling Tool")
-                tool_result = call_tool(tool_name, parameters)
+                if tool_name != "three_statements_":
+                    tool_result = call_tool(tool_name, parameters)
+                else:
+                    tool_result = three_statements_tool(tool_name, parameters)
                 if tool_result == "Unknown tool":
                     st.json("🔴Data not found")
 
@@ -157,14 +149,35 @@ def finance_assistant():
                     st.json(tool_result)
                     context = build_context(tool_name, tool_result)
                     final_prompt = f"{initial_prompt}\n\nTool Output:\n{context}"
+
                     final_response = run_gemini_prompt(final_prompt)
 
-                    st.markdown("#### 🧠 Final Answer:")
+                    st.markdown(f"#### 🧠 Final Answer\n**Company:** {parameters['company_names']}  \n**Financial Year:** {parameters['year']}")
+
+                    if tool_name !="three_statements_":
+                        df = flatten_all_financials(tool_result)
+                        for (company, year), group_df in df.groupby(["Company", "Year"]):
+                            st.markdown(f"### 🏢 Company: **{company}**, Year: **{year}**")
+                            st.dataframe(
+                                group_df[["Field", "Value"]].reset_index(drop=True).style.hide(axis="index")
+                            )
+
+                    else:
+                        df_income, df_cash, df_balance = three_statements_df(tool_result)
+                        st.markdown("### 📊 Income Statement")
+                        st.dataframe(df_income)
+
+                        st.markdown("### 💰 Cash Flow Statement")
+                        st.dataframe(df_cash)
+
+                        st.markdown("### 📄 Balance Sheet")
+                        st.dataframe(df_balance)
+
                     st.write(final_response)
             else:
                 st.warning("⚠️ No tool was detected for this query.")
         except Exception as e:
-            st.error(f"❌ An error occurred: {e}")
+            st.error(f"🔴 Data not found: {e}")
 
     if st.button("Logout"):
         logout()

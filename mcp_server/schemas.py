@@ -8,6 +8,11 @@ class CompareNetIncomeInput(BaseModel):
     year: str
     fields: Optional[List[str]] = None 
 
+class Company_Info_Input(BaseModel):
+    company_names: List[str]
+    year: str
+    fields: Optional[List[str]] = None 
+
 class CashFlowInput(BaseModel):
     company_names: List[str]
     year: str
@@ -22,6 +27,10 @@ class CompareNetIncomeOutput(BaseModel):
     comparison: Dict[str, Dict[str, Dict[str, Any]]]
     year: str
 
+class Company_Info_Output(BaseModel):
+    comparison: Dict[str, Dict[str, Dict[str, Any]]]
+    year: str
+
 
 class SummarizeBalanceSheetInput(BaseModel):
     company_names: List[str]
@@ -32,6 +41,14 @@ class SummarizeBalanceSheetOutput(BaseModel):
     comparison: Dict[str, Dict[str, Dict[str, Any]]]
     year: str
 
+class Financial_Ratio_Input(BaseModel):
+    company_names: List[str]
+    year: str
+    fields: Optional[List[str]] = None 
+
+class Financial_Ratio_Output(BaseModel):
+    comparison: Dict[str, Dict[str, Dict[str, Any]]]
+    year: str
 
 class QuarterlyIncomeInput(BaseModel):
     company_names: List[str]
@@ -41,5 +58,26 @@ class QuarterlyIncomeInput(BaseModel):
 
 
 class QuarterlyIncomeOutput(BaseModel):
+    comparison: Dict[str, Dict[str, Dict[str, Any]]]
+    year: str
+
+
+class QuarterlyShareholdingInput(BaseModel):
+    company_names: List[str]
+    year: str
+    quarter_month: List[str]
+    fields: Optional[List[str]] = None 
+
+
+class QuarterlyShareholdingOutput(BaseModel):
+    comparison: Dict[str, Dict[str, Dict[str, Any]]]
+    year: str
+
+class YearlyShareholdingInput(BaseModel):
+    company_names: List[str]
+    year: str
+    fields: Optional[List[str]] = None 
+
+class YearlyShareholdingOutput(BaseModel):
     comparison: Dict[str, Dict[str, Dict[str, Any]]]
     year: str

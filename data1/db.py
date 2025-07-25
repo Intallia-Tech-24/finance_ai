@@ -1,18 +1,22 @@
-
 import streamlit as st
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
 
-# Read DB config from Streamlit Secrets
-DB_USER = st.secrets["DB_USER"]
-DB_PASS = st.secrets["DB_PASS"]
-DB_HOST = st.secrets["DB_HOST"]
-DB_PORT = st.secrets["DB_PORT"]
-DB_NAME = st.secrets["DB_NAME"]
+# Load .env variables
+load_dotenv()
 
-# Validate secrets
+# Read DB config from environment variables
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+
+# Validate environment variables
 if not all([DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME]):
-    raise ValueError("One or more DB credentials are missing in Streamlit secrets")
+    raise ValueError("One or more DB credentials are missing in .env file")
 
 # MySQL connection string
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"

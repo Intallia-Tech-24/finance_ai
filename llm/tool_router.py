@@ -46,10 +46,14 @@ def extract_tool_call(gemini_response: str) -> dict:
     gemini_response_lower = gemini_response.lower()
     
 
+    matching_sheets_company_info_ = []
     matching_sheets_yearly_pnl = []
     matching_sheets_cashflow = []
     matching_balance_sheet = []
+    matching_financial_ratio = []
     matching_sheets_quarterly_pnl = []
+    matching_yearly_shareholding = []
+    matching_quarterly_shareholding = []
 
     ALL_COMPANIES = get_all_company_names()
     companies = find_matching_companies(gemini_response_lower, ALL_COMPANIES)
@@ -63,18 +67,27 @@ def extract_tool_call(gemini_response: str) -> dict:
     year = year_match.group(1) if year_match else "2023"
 
 
+    # 
     # 🛠 1. Net Income Tool
-    if "quarter" not in gemini_response_lower and "quarterly" not in gemini_response_lower:
-
+    if ("quarter" not in gemini_response_lower and 
+        "quarterly" not in gemini_response_lower and
+        "roe ratio" not in gemini_response_lower and
+        "roce ratio" not in gemini_response_lower
+        # "financial statement" not in gemini_response_lower and
+        # "three financial statement" not in gemini_response_lower
+    ):
         # 🛠 1. For company info
         _company_info_ = [
+            "basic company details", "company profile", "company profile","basic information","basic info","company details",
+            "company overview","company summary", "firm profile","business profile",
+            "corporate profile" , "company background", "organization overview",
             "company name", "firm name", "entity name",
             "sector", "industry", "business segment",
             "bse", "bse code", "bse ticker", "bse symbol",
             "nse", "nse code", "nse ticker", "nse symbol",
             "market cap", "market capitalization", "company size", "market value",
             "current price", "stock price", "share price", "cmp (current market price)",
-            "high / low", "52-week high", "52-week low", "stock range",
+            "high / low", "52-week high", "52-week low", "stock range", "high low",
             "stock p/e", "p/e ratio", "price to earnings",
             "book value", "book value per share", "net asset value",
             "dividend yield", "yield", "dividend %", "payout ratio",
@@ -133,7 +146,7 @@ def extract_tool_call(gemini_response: str) -> dict:
         # 🛠 2. For cashflow
         yearly_cashflow = [
             "cash from operating activities" ," net cash from operations", "operating cash flow",
-            "cash flow from operations","operating activity","investing activity","financing activity","cash flow"
+            "cash flow from operations","operating activities","investing activities","financing activities","cash flow"
             "cash from investing activities","net cash used in investing"," investing cash flow",
             "cash from financing activities",  "net cash from financing", "financing cash flow",
             "net cash flow","net increase/decrease in cash" ," net change in cash",
@@ -142,9 +155,23 @@ def extract_tool_call(gemini_response: str) -> dict:
         matching_sheets_cashflow = get_typo_tolerant_matches(yearly_cashflow, gemini_response_lower)
         # matching_sheets_cashflow = [sheet for sheet in yearly_cashflow if sheet in gemini_response_lower]
 
+        financial_ratio_ = [
+            "financial ratio", "ratio","financial ratios", "ratios",
+            "ratio date", "date", "reporting date", "data as of", "period end", "fiscal date",
+            "debtor days", "receivables days", "days sales outstanding", "dso", "debtor turnover days", "avg collection period",
+            "inventory days", "days inventory outstanding", "inventory holding period", "inventory turnover days", "doi",
+            "days payable", "payable days", "days payables outstanding", "dpo", "average payment period", "creditor days",
+            "cash conversion cycle", "ccc", "working capital cycle", "cash cycle", "net operating cycle",
+            "working capital days", "net working capital days", "wc days", "working capital cycle",
+            "roce percent",  "roce ratio", "operating return", "capital efficiency",
+            "roe percent", "roe ratio", "shareholders  return", "equity return", "net worth return"
+        ]
+
+        matching_financial_ratio = get_typo_tolerant_matches(financial_ratio_, gemini_response_lower)
+
         # 🛠 3. For yearly balance sheet
         yearly_balance_sheet = [
-            "balance sheet", "statement of financial position", "financial statement",
+            "balance sheet", "statement of financial position",
             "total assets", "gross assets", "sum of assets",
             "net loans", "net advances", "loans and advances (net)", "net loan portfolio",
             "total liabilities", "aggregate liabilities", "total obligations",
@@ -160,6 +187,22 @@ def extract_tool_call(gemini_response: str) -> dict:
 
         # matching_balance_sheet = [sheet for sheet in yearly_balance_sheet if sheet in gemini_response_lower]
         matching_balance_sheet = get_typo_tolerant_matches(yearly_balance_sheet, gemini_response_lower)
+
+        yearly_shareholding = [
+            "shareholdingpattern","shareholding pattern", "ownership structure", "capital structure", "institutional holding pattern"
+            "promoters", "promoter holding", "promoter group", "owner holding", "founders", "controlling shareholders",
+            "fiis", "fii holding", "foreign institutional investors", "foreign investors", "overseas shareholders",
+            "diis", "dii holding", "domestic institutional investors", "mutual funds", "insurance companies",
+            "public", "public holding", "retail investors", "non-institutional investors", "general public",
+            "no. of shareholders", "shareholder count", "number of shareholders", "investor base size",
+            "others", "others category", "miscellaneous holding", "unidentified shareholders",
+            "government", "government holding", "state holding", "public sector holding", "govt stake"
+        ]
+
+        matching_yearly_shareholding = get_typo_tolerant_matches(yearly_shareholding, gemini_response_lower)
+
+        financial_statement_list = ["financial statement"]
+        matching_financial_statement = get_typo_tolerant_matches(financial_statement_list, gemini_response_lower)
 
     else:
         quarterly_pnl_ = [
@@ -182,12 +225,36 @@ def extract_tool_call(gemini_response: str) -> dict:
             "net_npa", "net non-performing assets", "net npa ratio", "non-performing assets"
         ]
 
-        # matching_sheets_quarterly_pnl  = [sheet for sheet in quarterly_pnl_ if sheet in gemini_response_lower]
         matching_sheets_quarterly_pnl = get_typo_tolerant_matches(quarterly_pnl_, gemini_response_lower)
 
+        quarterly_shareholding = [
+            "shareholdingpattern","shareholding pattern", "ownership structure", "capital structure", "institutional holding pattern"
+            "promoters", "promoter holding", "promoter group", "owner holding", "founders", "controlling shareholders",
+            "fiis", "fii holding", "foreign institutional investors", "foreign investors", "overseas shareholders",
+            "diis", "dii holding", "domestic institutional investors", "mutual funds", "insurance companies",
+            "public", "public holding", "retail investors", "non-institutional investors", "general public",
+            "no. of shareholders", "shareholder count", "number of shareholders", "investor base size",
+            "others", "others category", "miscellaneous holding", "unidentified shareholders",
+            "government", "government holding", "state holding", "public sector holding", "govt stake"
+        ]
 
-  
-    if matching_sheets_yearly_pnl and companies:
+        matching_quarterly_shareholding = get_typo_tolerant_matches(quarterly_shareholding, gemini_response_lower)
+
+        ratios_to_check = ['roe ratio', 'roce ratio']
+        matching_financial_ratio = [r for r in ratios_to_check if r in gemini_response_lower]
+    
+
+    if matching_sheets_company_info_ and companies:
+        return {
+            "tool_name": "company_info_",
+            "parameters": {
+                "company_names": companies,
+                "year": year,
+                "fields": matching_sheets_company_info_
+            }
+    }
+
+    elif matching_sheets_yearly_pnl and companies:
         return {
             "tool_name": "compare_net_income",
             "parameters": {
@@ -195,10 +262,10 @@ def extract_tool_call(gemini_response: str) -> dict:
                 "year": year,
                 "fields": matching_sheets_yearly_pnl
             }
-        }
-    
+    }
+
     elif matching_sheets_cashflow and companies:
-        
+
         return {
             "tool_name": "cash_flow",
             "parameters": {
@@ -219,6 +286,28 @@ def extract_tool_call(gemini_response: str) -> dict:
                         "fields" : matching_balance_sheet
                     }
                 }
+    elif matching_yearly_shareholding and companies:
+
+            if companies:
+                return {
+                    "tool_name": "yearly_shareholding",
+                    "parameters": {
+                        "company_names": companies,
+                        "year": year,
+                        "fields" : matching_yearly_shareholding
+                    }
+                }
+    elif matching_financial_ratio and companies:
+
+                return {
+                    "tool_name": "financial_ratio",
+                    "parameters": {
+                        "company_names": companies,
+                        "year": year,
+                        "fields" : matching_financial_ratio
+                    }
+                }
+
     elif matching_sheets_quarterly_pnl and companies:
         quarter_month = {
             "first": "first",
@@ -237,7 +326,6 @@ def extract_tool_call(gemini_response: str) -> dict:
             if k in gemini_response_lower:
                 quarter_get.append(v)
 
-        # breakpoint()
         return {
             "tool_name": "compare_quarterly_income",
             "parameters": {
@@ -249,6 +337,45 @@ def extract_tool_call(gemini_response: str) -> dict:
         }
     
 
+    elif matching_quarterly_shareholding and companies:
+        quarter_month = {
+            "first": "first",
+            "1st" : "first",
+            "second": "second",
+            "2nd": "second",
+            "third": "third",
+            "3rd" : "third",
+            "fourth": "fourth",
+            "4th": "fourth",
+            "last" : "fourth"
+        }
+
+        quarter_get = []
+        for k, v in quarter_month.items():
+            if k in gemini_response_lower:
+                quarter_get.append(v)
+
+
+        return {
+            "tool_name": "quarterly_shareholding",
+            "parameters": {
+                "company_names": companies,
+                "year": year,
+                "quarter_month": quarter_get,
+                "fields": matching_quarterly_shareholding
+            }
+        }
+
+    elif matching_financial_statement and companies:
+
+            return {
+                "tool_name": "three_statements_",
+                "parameters": {
+                    "company_names": companies,
+                    "year": year,
+                    "fields" : matching_financial_statement
+                }
+            }
     # 🛑 If nothing matched
     return {
         "tool_name": None,
